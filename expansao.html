@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticnes AI - Análise de Demanda para Expansão</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS incorporado - Design moderno e responsivo */
+        :root {
+            --primary-color: #0a1f44;
+            --secondary-color: #00d4ff;
+            --accent-color: #7c3aed;
+            --light-color: #f8fafc;
+            --dark-color: #0f172a;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --gray-color: #64748b;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1e3a8a 100%);
+            color: white;
+            padding: 2rem 0;
+            border-bottom: 4px solid var(--secondary-color);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .logo span {
+            color: var(--secondary-color);
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        /* Main content */
+        main {
+            padding: 2rem 0;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--secondary-color);
+        }
+
+        /* Cards */
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .required::after {
+            content: " *";
+            color: var(--danger-color);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+        }
+
+        .optional {
+            font-size: 0.9rem;
+            color: var(--gray-color);
+            font-style: italic;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: #142850;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #00b8e6;
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #6d28d9;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Results */
+        .results-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .localities-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .localities-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .localities-list::-webkit-scrollbar-thumb {
+            background-color: var(--secondary-color);
+            border-radius: 4px;
+        }
+
+        .locality-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            transition: var(--transition);
+        }
+
+        .locality-item:hover {
+            background-color: #f8fafc;
+        }
+
+        .locality-name {
+            font-weight: 600;
+        }
+
+        .locality-count {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .highlight {
+            animation: pulse 2s infinite;
+            border-left: 4px solid var(--secondary-color);
+            background-color: rgba(0, 212, 255, 0.05);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 212, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0); }
+        }
+
+        /* Bar chart */
+        .chart-container {
+            margin-top: 1.5rem;
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .bar-label {
+            width: 150px;
+            font-weight: 600;
+        }
+
+        .bar {
+            flex: 1;
+            height: 30px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            width: 0%;
+            transition: width 1.5s ease;
+            position: relative;
+        }
+
+        .bar-percentage {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Verification result */
+        .verification-result {
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        .viable {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .not-viable {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .result-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .alert-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .alert i {
+            font-size: 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .footer-logo span {
+            color: var(--secondary-color);
+        }
+
+        .copyright {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <div>
+                        <h1>Ticnes <span>AI</span></h1>
+                        <p class="tagline">Imagine..., e faça acontecer com IA,
+...SEM DESCULPAS ! </p>
+                    </div>
+                </div>
+                <div>
+                    <p><i class="fas fa-users"></i> <span id="totalUsers">0</span> interessados registrados</p>
+                    <p><i class="fas fa-map-marker-alt"></i> <span id="totalLocalities">0</span> localidades analisadas</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+
+        <!-- Data Entry Section -->
+        <section class="card">
+            <h2 class="section-title"><i class="fas fa-user-plus"></i> Formulário de Interesse</h2>
+            <p>Preencha o formulário para registrar seu interesse na expansão da Ticnes AI em sua localidade.</p>
+            
+            <form id="interestForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name" class="required">Nome completo</label>
+                        <input type="text" id="name" required placeholder="Digite seu nome">
+                    </div>
+                    <div class="form-group">
+                        <label for="location" class="required">Localidade</label>
+                        <input type="text" id="location" required placeholder="Cidade, Estado">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">E-mail <span class="optional">(opcional)</span></label>
+                        <input type="email" id="email" placeholder="seu@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="interest">Área de interesse <span class="optional">(opcional)</span></label>
+                        <select id="interest">
+                            <option value="">Selecione uma opção</option>
+                            <option value="tecnologia">Tecnologia</option>
+                            <option value="saude">Cyber Segurança</option>
+                            <option value="educacao">IA</option>
+                            <option value="financas">Robótica</option>
+                            <option value="varejo">Programação</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Registrar Interesse
+                    </button>
+                    <button type="button" id="clearDataBtn" class="btn btn-danger btn-small">
+                        <i class="fas fa-trash"></i> Limpar Todos os Dados
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Location Verification Section -->
+        <section class="card">
+            <h2 class="section-title"><i class="fas fa-search"></i> Verificação de Viabilidade</h2>
+            <p>Verifique se uma localidade é viável para expansão com base nos dados coletados.</p>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="verifyLocation">Localidade para verificar</label>
+                    <input type="text" id="verifyLocation" placeholder="Digite a cidade e estado">
+                </div>
+                <div class="form-group" style="display: flex; align-items: flex-end;">
+                    <button id="verifyBtn" class="btn btn-secondary">
+                        <i class="fas fa-check-circle"></i> Verificar Viabilidade
+                    </button>
+                </div>
+            </div>
+            
+            <div id="verificationResult" class="verification-result">
+                <!-- Resultado será inserido aqui via JavaScript -->
+            </div>
+        </section>
+
+        <!-- Data Visualization Section -->
+        <section class="card">
+            <h2 class="section-title"><i class="fas fa-chart-bar"></i> Análise de Demanda por Localidade</h2>
+            <p>Visualize as localidades com maior potencial para expansão com base no interesse registrado.</p>
+            
+            <div class="results-container">
+                <div>
+                    <h3><i class="fas fa-list-ol"></i> Ranking de Localidades</h3>
+                    <div id="localitiesList" class="localities-list">
+                        <!-- Lista de localidades será inserida aqui via JavaScript -->
+                        <p id="noDataMessage">Nenhum dado registrado ainda. Preencha o formulário acima para começar a análise.</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3><i class="fas fa-chart-line"></i> Distribuição Percentual</h3>
+                    <div id="chartContainer" class="chart-container">
+                        <!-- Gráfico será inserido aqui via JavaScript -->
+                        <p id="noChartMessage">Os gráficos serão exibidos assim que houver dados suficientes.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <button id="exportDataBtn" class="btn btn-small">
+                    <i class="fas fa-download"></i> Exportar Dados
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">Ticnes <span>AI</span></div>
+                <div>
+                    <p><i class="fas fa-map-marker-alt"></i> Luanda, Angola</p>
+                    <p><i class="fas fa-envelope"></i> contato@ticnesai.com</p>
+                </div>
+                <div class="copyright">
+                    <p>&copy; 2015 Ticnes AI. Todos os direitos reservados.</p>
+                    <p>Análise de dados para decisões estratégicas de expansão.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript incorporado -->
+    <script>
+        // Armazenamento de dados - usando localStorage para persistência
+        const STORAGE_KEY = 'ticnesAIUserData';
+        
+        // Inicializar dados
+        let userData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        
+        // Elementos DOM
+        const interestForm = document.getElementById('interestForm');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const verifyLocationInput = document.getElementById('verifyLocation');
+        const verificationResult = document.getElementById('verificationResult');
+        const localitiesList = document.getElementById('localitiesList');
+        const chartContainer = document.getElementById('chartContainer');
+        const noDataMessage = document.getElementById('noDataMessage');
+        const noChartMessage = document.getElementById('noChartMessage');
+        const totalUsersEl = document.getElementById('totalUsers');
+        const totalLocalitiesEl = document.getElementById('totalLocalities');
+        const alertContainer = document.getElementById('alertContainer');
+        const exportDataBtn = document.getElementById('exportDataBtn');
+        
+        // Atualizar contadores
+        function updateCounters() {
+            totalUsersEl.textContent = userData.length;
+            
+            // Contar localidades únicas
+            const uniqueLocations = [...new Set(userData.map(user => user.location.toLowerCase().trim()))];
+            totalLocalitiesEl.textContent = uniqueLocations.length;
+        }
+        
+        // Mostrar alerta
+        function showAlert(message, type = 'success') {
+            const alertEl = document.createElement('div');
+            alertEl.className = `alert alert-${type}`;
+            alertEl.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+                <div>${message}</div>
+            `;
+            
+            alertContainer.appendChild(alertEl);
+            
+            // Remover alerta após 5 segundos
+            setTimeout(() => {
+                alertEl.remove();
+            }, 5000);
+        }
+        
+        // Processar dados do formulário
+        interestForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Obter valores do formulário
+            const name = document.getElementById('name').value.trim();
+            const location = document.getElementById('location').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const interest = document.getElementById('interest').value;
+            
+            // Validar campos obrigatórios
+            if (!name || !location) {
+                showAlert('Por favor, preencha todos os campos obrigatórios.', 'danger');
+                return;
+            }
+            
+            // Adicionar novo usuário aos dados
+            const newUser = {
+                id: Date.now(), // ID único baseado em timestamp
+                name: name,
+                location: location,
+                email: email || null,
+                interest: interest || null,
+                timestamp: new Date().toISOString()
+            };
+            
+            userData.push(newUser);
+            
+            // Salvar no localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+            
+            // Atualizar a interface
+            updateCounters();
+            updateLocalitiesList();
+            updateChart();
+            
+            // Mostrar mensagem de sucesso
+            showAlert(`Interesse registrado com sucesso! ${name} de ${location} foi adicionado à análise.`);
+            
+            // Limpar formulário (exceto campos opcionais)
+            document.getElementById('name').value = '';
+            document.getElementById('location').value = '';
+        });
+        
+        // Limpar todos os dados
+        clearDataBtn.addEventListener('click', function() {
+            if (userData.length === 0) {
+                showAlert('Não há dados para limpar.', 'danger');
+                return;
+            }
+            
+            if (confirm('Tem certeza que deseja limpar todos os dados? Esta ação não pode ser desfeita.')) {
+                userData = [];
+                localStorage.removeItem(STORAGE_KEY);
+                
+                updateCounters();
+                updateLocalitiesList();
+                updateChart();
+                
+                showAlert('Todos os dados foram removidos com sucesso.');
+            }
+        });
+        
+        // Verificar viabilidade de localidade
+        verifyBtn.addEventListener('click', function() {
+            const locationToVerify = verifyLocationInput.value.trim();
+            
+            if (!locationToVerify) {
+                showAlert('Por favor, digite uma localidade para verificar.', 'danger');
+                return;
+            }
+            
+            // Calcular estatísticas
+            const stats = calculateLocationStats();
+            
+            // Verificar se a localidade está nos dados
+            const normalizedLocation = locationToVerify.toLowerCase();
+            const locationData = stats.find(item => 
+                item.location.toLowerCase().includes(normalizedLocation) || 
+                normalizedLocation.includes(item.location.toLowerCase())
+            );
+            
+            // Determinar viabilidade
+            let isViable = false;
+            let reason = '';
+            
+            if (locationData) {
+                // Verificar se está entre as 3 principais localidades
+                const topLocations = stats.slice(0, 3);
+                const isTopLocation = topLocations.some(item => item.location === locationData.location);
+                
+                if (isTopLocation) {
+                    isViable = true;
+                    reason = `Esta localidade está entre as 3 principais com ${locationData.count} interessados (${locationData.percentage}% do total).`;
+                } else if (locationData.percentage >= 10) {
+                    isViable = true;
+                    reason = `Esta localidade tem uma demanda significativa: ${locationData.count} interessados (${locationData.percentage}% do total).`;
+                } else if (locationData.count >= 5) {
+                    isViable = true;
+                    reason = `Esta localidade tem uma base sólida de ${locationData.count} interessados.`;
+                } else {
+                    reason = `Esta localidade tem apenas ${locationData.count} interessados (${locationData.percentage}% do total). Considere outras localidades com maior demanda.`;
+                }
+            } else {
+                reason = 'Esta localidade ainda não tem interessados registrados. Pode ser uma oportunidade de mercado inexplorado ou precisa de mais divulgação.';
+            }
+            
+            // Mostrar resultado
+            verificationResult.className = `verification-result ${isViable ? 'viable' : 'not-viable'}`;
+            verificationResult.innerHTML = `
+                <div class="result-title">
+                    <i class="fas fa-${isViable ? 'check-circle' : 'times-circle'}"></i>
+                    ${locationToVerify} - ${isViable ? 'VIÁVEL PARA EXPANSÃO' : 'NÃO VIÁVEL NO MOMENTO'}
+                </div>
+                <p>${reason}</p>
+                ${locationData ? `<p><strong>Detalhes:</strong> ${locationData.count} interessados, representando ${locationData.percentage}% do total.</p>` : ''}
+            `;
+            verificationResult.style.display = 'block';
+        });
+        
+        // Calcular estatísticas por localidade
+        function calculateLocationStats() {
+            if (userData.length === 0) return [];
+            
+            // Agrupar por localidade
+            const locationCounts = {};
+            
+            userData.forEach(user => {
+                const location = user.location.trim();
+                locationCounts[location] = (locationCounts[location] || 0) + 1;
+            });
+            
+            // Converter para array e calcular percentuais
+            const totalUsers = userData.length;
+            const stats = Object.keys(locationCounts).map(location => {
+                const count = locationCounts[location];
+                const percentage = ((count / totalUsers) * 100).toFixed(1);
+                return { location, count, percentage: parseFloat(percentage) };
+            });
+            
+            // Ordenar por contagem (decrescente)
+            stats.sort((a, b) => b.count - a.count);
+            
+            return stats;
+        }
+        
+        // Atualizar lista de localidades
+        function updateLocalitiesList() {
+            const stats = calculateLocationStats();
+            
+            if (stats.length === 0) {
+                noDataMessage.style.display = 'block';
+                localitiesList.innerHTML = '<p id="noDataMessage">Nenhum dado registrado ainda. Preencha o formulário acima para começar a análise.</p>';
+                return;
+            }
+            
+            noDataMessage.style.display = 'none';
+            
+            // Gerar HTML para a lista
+            let html = '';
+            stats.forEach((item, index) => {
+                // Destacar as 3 principais localidades
+                const isHighlighted = index < 3 ? 'highlight' : '';
+                
+                html += `
+                    <div class="locality-item ${isHighlighted}">
+                        <div>
+                            <div class="locality-name">${item.location}</div>
+                            <div style="font-size: 0.9rem; color: var(--gray-color);">${item.percentage}% do total</div>
+                        </div>
+                        <div class="locality-count">${item.count} interessado(s)</div>
+                    </div>
+                `;
+            });
+            
+            localitiesList.innerHTML = html;
+        }
+        
+        // Atualizar gráfico de barras
+        function updateChart() {
+            const stats = calculateLocationStats();
+            
+            if (stats.length === 0) {
+                noChartMessage.style.display = 'block';
+                chartContainer.innerHTML = '<p id="noChartMessage">Os gráficos serão exibidos assim que houver dados suficientes.</p>';
+                return;
+            }
+            
+            noChartMessage.style.display = 'none';
+            
+            // Limitar a 8 localidades para melhor visualização
+            const displayStats = stats.slice(0, 8);
+            
+            // Gerar HTML para o gráfico
+            let html = '';
+            displayStats.forEach(item => {
+                html += `
+                    <div class="bar-item">
+                        <div class="bar-label">${item.location}</div>
+                        <div class="bar">
+                            <div class="bar-fill" style="width: ${item.percentage}%"></div>
+                            <div class="bar-percentage">${item.percentage}%</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            chartContainer.innerHTML = html;
+            
+            // Animar barras após um breve delay
+            setTimeout(() => {
+                const barFills = document.querySelectorAll('.bar-fill');
+                barFills.forEach(bar => {
+                    // Reiniciar animação
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = bar.style.width;
+                    }, 10);
+                });
+            }, 100);
+        }
+        
+        // Exportar dados
+        exportDataBtn.addEventListener('click', function() {
+            if (userData.length === 0) {
+                showAlert('Não há dados para exportar.', 'danger');
+                return;
+            }
+            
+            // Criar objeto com dados formatados
+            const exportData = {
+                empresa: "Ticnes AI",
+                dataExportacao: new Date().toISOString(),
+                totalInteressados: userData.length,
+                localidades: calculateLocationStats(),
+                dadosCompletos: userData
+            };
+            
+            // Converter para JSON
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            // Criar link de download
+            const exportFileDefaultName = `ticnes-ai-dados-${new Date().toISOString().slice(0, 10)}.json`;
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showAlert('Dados exportados com sucesso!');
+        });
+        
+        // Inicializar a interface
+        function initApp() {
+            updateCounters();
+            updateLocalitiesList();
+            updateChart();
+            
+            // Adicionar alguns dados de exemplo se estiver vazio
+            if (userData.length === 0) {
+                const sampleData = [
+                    {id: 1, name: "Carlos Silva", location: "Luanda", email: "carlos@email.com", interest: "tecnologia", timestamp: "2023-10-01T10:00:00Z"},
+                    {id: 2, name: "Ana Santos", location: "Viana", email: "ana@email.com", interest: "saude", timestamp: "2023-10-02T11:30:00Z"},
+                    {id: 3, name: "Roberto Alves", location: "Cazenga", email: "roberto@email.com", interest: "financas", timestamp: "2023-10-03T09:15:00Z"},
+                    {id: 4, name: "Mariana Costa", location: "Mussulo", email: "mariana@email.com", interest: "educacao", timestamp: "2023-10-04T14:20:00Z"},
+                    {id: 5, name: "João Pereira", location: "Futungo", email: "joao@email.com", interest: "tecnologia", timestamp: "2023-10-05T16:45:00Z"},
+                    {id: 6, name: "Fernanda Lima", location: "Vila", email: "fernanda@email.com", interest: "varejo", timestamp: "2023-10-06T12:10:00Z"},
+                    {id: 7, name: "Ricardo Souza", location: "Gamek", email: "ricardo@email.com", interest: "tecnologia", timestamp: "2023-10-07T13:30:00Z"},
+                    {id: 8, name: "Patrícia Oliveira", location: "Catete", email: "patricia@email.com", interest: "saude", timestamp: "2023-10-08T15:00:00Z"},
+                    {id: 9, name: "Gabriel Martins", location: "Kilamba", email: "gabriel@email.com", interest: "educacao", timestamp: "2023-10-09T10:45:00Z"},
+                    {id: 10, name: "Juliana Ferreira", location: "Zango", email: "juliana@email.com", interest: "financas", timestamp: "2023-10-10T11:20:00Z"}
+                ];
+                
+                // Adicionar apenas se não houver dados (primeira visita)
+                userData = sampleData;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+                updateCounters();
+                updateLocalitiesList();
+                updateChart();
+            }
+        }
+        
+        // Inicializar a aplicação quando a página carregar
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
